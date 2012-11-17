@@ -59,8 +59,6 @@ instalá-lo. Dê uma olhada na seção :ref:`windows-easy-install` para mais
 instruções de como fazer isso. Depois de instalar, execute os mesmos comandos
 anteriores, mas sem o prefixo `sudo`.
 
-.. _ambiente:
-
 Criando um ambiente para seu projeto
 ::::::::::::::::::::::::::::::::::::
 
@@ -178,7 +176,7 @@ Se tudo deu certo, finalmente você pode instalar o virtualenv::
 
     > pip install virtualenv
 
-Feito isso, pode continuar a partir de ambiente_.
+Feito isso, pode continuar a partir de `Criando um ambiente para seu projeto`_.
 
 
 .. _distribute_setup.py: http://python-distribute.org/distribute_setup.py
