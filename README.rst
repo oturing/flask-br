@@ -2,9 +2,17 @@
 Documentação do Flask em português
 ==================================
 
-Este projeto contém apenas o sub-diretório ``docs/`` do projeto Flask_, 
+Este projeto contém apenas o sub-diretório ``docs/`` do projeto Flask_,
 traduzido (parcialmente) para o português do Brasil pelas `Oficinas Turing`_.
 
 .. _Flask: https://github.com/mitsuhiko/flask
 
-.. _OFicinas Turing: http://turing.com.br
+.. _Oficinas Turing: http://turing.com.br
+
+Arquivos traduzidos
+===================
+
+- `Introdução <https://github.com/oturing/flask-br/blob/master/docs/foreword.rst>`_
+
+- `Instalação <https://github.com/oturing/flask-br/blob/master/docs/installation.rst>`_
+
