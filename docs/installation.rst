@@ -1,68 +1,41 @@
 .. _installation:
 
-Installation
+Instalação
 ============
 
-Flask depends on two external libraries, `Werkzeug
-<http://werkzeug.pocoo.org/>`_ and `Jinja2 <http://jinja.pocoo.org/2/>`_.
-Werkzeug is a toolkit for WSGI, the standard Python interface between web
-applications and a variety of servers for both development and deployment.
-Jinja2 renders templates.
+O Flask depende de duas bibliotecas externas,`Werkzeug
+<http://werkzeug.pocoo.org/>`_ e `Jinja2 <http://jinja.pocoo.org/2/>`_. Werkzeug é um toolkit para WSGI, a interface padrão do Python entre aplicações web e diversos servidores para desenvolvimento e implantação. Jinja2 renderiza templates.
 
-So how do you get all that on your computer quickly?  There are many ways you
-could do that, but the most kick-ass method is virtualenv, so let's have a look
-at that first.
+Mas como botar tudo isso rapidamente funcionando no computador? Existem várias formas, mas o método mais irado é o virtualenv, então, vamos dar uma olhada nele primeiro.
 
-You will need Python 2.5 or higher to get started, so be sure to have an
-up-to-date Python 2.x installation.  At the time of writing, the WSGI
-specification has not yet been finalized for Python 3, so Flask cannot support
-the 3.x series of Python.
+Você vai precisar de Python 2.5 ou superior para começar, então, verifique se está com uma instalação atualizada do Python 2.x. Quando escrevi este texto, a especificação do WSGI ainda não tinha sido finalizada para Python 3, portanto, o Flask ainda não suporta a série 3.x do Python.
 
 .. _virtualenv:
 
 virtualenv
 ----------
 
-Virtualenv is probably what you want to use during development, and if you have
-shell access to your production machines, you'll probably want to use it there,
-too.
+O virtualenv é super apropriado para desenvolvimento, e se você tiver acesso ao shell das máquinas de produção, provavelmente vai querer usá-lo lá também.
 
-What problem does virtualenv solve?  If you like Python as much as I do,
-chances are you want to use it for other projects besides Flask-based web
-applications.  But the more projects you have, the more likely it is that you
-will be working with different versions of Python itself, or at least different
-versions of Python libraries.  Let's face it: quite often libraries break
-backwards compatibility, and it's unlikely that any serious application will
-have zero dependencies.  So what do you do if two or more of your projects have
-conflicting dependencies?
+Que tipo de problema o virtualenv resolve? Se você gosta de Python tanto quanto eu, aposto que vai querer usá-lo em outros projetos, além de aplicações web baseadas em Flask. Mas, quanto mais projetos você tiver, maior a chance de que irá trabalhar com diferentes versões do Python em si, ou pelo menos diferentes versões de bibliotecas Python. Falando francamente: bibliotecas frequentemente quebram a compatibilidade com versões anteriores, e é pouco provável que qualquer aplicação séria tenha zero dependências. Então, quê fazer se dois ou mais projetos tiverem dependências conflitantes?
 
-Virtualenv to the rescue!  Virtualenv enables multiple side-by-side
-installations of Python, one for each project.  It doesn't actually install
-separate copies of Python, but it does provide a clever way to keep different
-project environments isolated.  Let's see how virtualenv works.
+Apele para o virtualenv! O virtualenv permite múltiplas instalações paralelas de Python, uma para cada projeto. Na verdade, não é que o virtualenv instala cópias separadas de Python, mas, sim, fornece um jeito inteligente de manter isolados diferentes ambientes de projeto. Vamos ver como o virtualenv funciona.
 
-If you are on Mac OS X or Linux, chances are that one of the following two
-commands will work for you::
+No Mac OS X ou Linux, é quase certo que um desses dois comandos funcione::
 
     $ sudo easy_install virtualenv
 
-or even better::
+ou, melhor ainda::
 
     $ sudo pip install virtualenv
 
-One of these will probably install virtualenv on your system.  Maybe it's even
-in your package manager.  If you use Ubuntu, try::
+Provavelmente, um desses comandos vai instalar o virtualenv no sistema. Talvez até mesmo no gerenciador de pacotes. No Ubuntu, tente usar este comando::
 
     $ sudo apt-get install python-virtualenv
 
-If you are on Windows and don't have the `easy_install` command, you must
-install it first.  Check the :ref:`windows-easy-install` section for more
-information about how to do that.  Once you have it installed, run the same
-commands as above, but without the `sudo` prefix.
+No Windows, se você não tiver o comando `easy_install`, primeiro é preciso instalá-lo. Dê uma olhada na seção :ref:`windows-easy-install` para mais instruções de como fazer isso. Depois de instalar, execute os mesmos comandos anteriores, mas sem o prefixo `sudo`.
 
-Once you have virtualenv installed, just fire up a shell and create
-your own environment.  I usually create a project folder and a `venv`
-folder within::
+Depois de instalar o virtualenv, basta abrir um shell e criar o seu próprio ambiente. Eu costumo criar uma pasta de projeto com uma subpasta `venv`::
 
     $ mkdir myproject
     $ cd myproject
@@ -70,46 +43,39 @@ folder within::
     New python executable in venv/bin/python
     Installing distribute............done.
 
-Now, whenever you want to work on a project, you only have to activate the
-corresponding environment.  On OS X and Linux, do the following::
+Daí, sempre que você quiser trabalhar num projeto, basta ativar o ambiente correspondente. No OS X e no Linux, faça o seguinte ::
 
     $ . venv/bin/activate
 
-If you are a Windows user, the following command is for you::
+Se for usuário de Windows, use o seguinte comando::
 
     $ venv\scripts\activate
 
-Either way, you should now be using your virtualenv (notice how the prompt of
-your shell has changed to show the active environment).
+Um dos dois procedimentos irá ativar o seu virtualenv (observe que o prompt do seu shell muda, passando a mostrar o ambiente que está ativo).
 
-Now you can just enter the following command to get Flask activated in your
-virtualenv::
+Em seguida, para ativar o Flask no seu virtualenv, digite o seguinte comando::
 
     $ pip install Flask
 
-A few seconds later and you are good to go.
+Aguarde alguns segundos e estará tudo pronto para usar.
 
 
-System-Wide Installation
-------------------------
+Instalação no sistema como um todo
+----------------------------------
 
-This is possible as well, though I do not recommend it.  Just run
-`pip` with root privileges::
+É também possível instalar no sistema como um todo, embora eu não recomende. Basta executar `pip` com privilégios de root::
 
     $ sudo pip install Flask
 
-(On Windows systems, run it in a command-prompt window with administrator
-privileges, and leave out `sudo`.)
+(No Windows, execute-o numa janela de prompt, com privilégios de administrador, e não coloque `sudo`).
 
 
-Living on the Edge
+Vivendo no limite
 ------------------
 
-If you want to work with the latest version of Flask, there are two ways: you
-can either let `pip` pull in the development version, or you can tell
-it to operate on a git checkout.  Either way, virtualenv is recommended.
+Se quiser trabalhar com a versão mais recente do Flask, escolha uma dessas opções: deixe `pip` baixar a versão de desenvolvimento, ou faça com que opere um git checkout. O virtualenv é recomendado nos dois casos.
 
-Get the git checkout in a new virtualenv and run in development mode::
+Pegue o git checkout num novo virtualenv e execute-o no modo de desenvolvimento::
 
     $ git clone http://github.com/mitsuhiko/flask.git
     Initialized empty Git repository in ~/dev/flask/.git/
@@ -122,11 +88,9 @@ Get the git checkout in a new virtualenv and run in development mode::
     ...
     Finished processing dependencies for Flask
 
-This will pull in the dependencies and activate the git head as the current
-version inside the virtualenv.  Then all you have to do is run ``git pull
-origin`` to update to the latest version.
+Isso vai baixar as dependências e ativar o git head como a versão corrente dentro do virtualenv. Daí, basta executar o ``git pull origin`` para atualizar para a versão mais recente.
 
-To just get the development version without git, do this instead::
+Para obter apenas a versão de desenvolvimento, sem git, faça isto::
 
     $ mkdir flask
     $ cd flask
@@ -140,33 +104,21 @@ To just get the development version without git, do this instead::
 
 .. _windows-easy-install:
 
-`pip` and `distribute` on Windows
+`pip` e `distribute` no Windows
 -----------------------------------
 
-On Windows, installation of `easy_install` is a little bit trickier, but still
-quite easy.  The easiest way to do it is to download the
-`distribute_setup.py`_ file and run it.  The easiest way to run the file is to
-open your downloads folder and double-click on the file.
+No Windows, a instalação do `easy_install` é um pouco mais complicada, mas ainda assim muito fácil. A maneira mais fácil de fazer isso é baixar o arquivo `distribute_setup.py`_ e executá-lo. O jeito mais fácil de executar o arquivo é abrir a pasta de downloads e clicar duas vezes no arquivo.
 
-Next, add the `easy_install` command and other Python scripts to the
-command search path, by adding your Python installation's Scripts folder
-to the `PATH` environment variable.  To do that, right-click on the
-"Computer" icon on the Desktop or in the Start menu, and choose "Properties".
-Then click on "Advanced System settings" (in Windows XP, click on the
-"Advanced" tab instead).  Then click on the "Environment variables" button.
-Finally, double-click on the "Path" variable in the "System variables" section,
-and add the path of your Python interpreter's Scripts folder. Be sure to
-delimit it from existing values with a semicolon.  Assuming you are using
-Python 2.7 on the default path, add the following value::
+.. xxx: rever nomes dos comandos abaixo no windows
+
+Em seguida, adicione o comando `easy_install` e outros scripts em Python ao caminho do comando de busca, adicionando a sua pasta de Scripts de instalação do Python à variável do ambiente `PATH`. Para fazer isso, clique com o botão direito do mouse no ícone "Computador", no Desktop ou no menu Iniciar, e selecione "Propriedades". Depois, clique em "Configurações avançadas do sistema" (ser for Windows XP, clique na aba "Avançado"). Daí, clique no botão "Variáveis ​​de ambiente". Por fim, clique duas vezes na variável "Caminho", na seção "Variáveis ​​do sistema", e adicione o caminho da sua pasta de Scripts interpretadores de Python. Use ponto e vírgula, para não misturá-lo com valores existentes. Pressupondo que você está usando Python 2.7 no caminho padrão, adicione o seguinte valor::
 
 
     ;C:\Python27\Scripts
 
-And you are done!  To check that it worked, open the Command Prompt and execute
-``easy_install``.  If you have User Account Control enabled on Windows Vista or
-Windows 7, it should prompt you for administrator privileges.
+Pronto! Para verificar se funcionou, abra o Prompt de Comando e execute ``easy_install``. Se você tiver o User Account Control ativado no Windows Vista ou Windows 7, serão solicitados privilégios de administrador.
 
-Now that you have ``easy_install``, you can use it to install ``pip``::
+Você pode agora usar o ``easy_install`` para instalar o ``pip``::
 
     > easy_install pip
 
