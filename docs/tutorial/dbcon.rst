@@ -59,7 +59,7 @@ Continue com :ref:`tutorial-views`.
    idéia organizar o código em vários arquivos separados.
 
 .. _exemplo traduzido:
-   http://github.com/mitsuhiko/flask/tree/master/examples/flaskr/
+   http://github.com/oturing/flask-br/tree/master/flaskr
 
 .. _exemplo original:
    http://github.com/mitsuhiko/flask/tree/master/examples/flaskr/
