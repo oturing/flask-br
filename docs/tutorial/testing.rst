@@ -1,10 +1,10 @@
 .. _tutorial-testing:
 
-Bonus: Testing the Application
-==============================
+Bonus: testando a aplicação
+===========================
 
-Now that you have finished the application and everything works as
-expected, it's probably not a bad idea to add automated tests to simplify
-modifications in the future.  The application above is used as a basic
-example of how to perform unittesting in the :ref:`testing` section of the
-documentation.  Go there to see how easy it is to test Flask applications.
+Agora que você terminou a aplicação e tudo funciona como esperado,
+provavelmente é uma boa idéia criar testes automatizados para facilitar
+futuras modificações. A aplicação Flaskr é utilizado como um exemplo básico de
+como fazer testes unitários da seção :ref:`testing` da documentação. Veja lá
+como é fácil testar aplicações no Flask.

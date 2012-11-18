@@ -28,31 +28,14 @@ pode ser substituído por um bloco de mesmo nome (``corpo``) em um template
 derivado deste.
 
 O dict :class:`~flask.session` está disponível para o template também, e pode
-ser usado para verificar se o usuário está logado ou não. Note que no Jinga
+ser usado para verificar se o usuário está logado ou não. Note que no Jinja
 você pode acessar atributos ou itens inexistentes em objetos e coleções sem
 disparar um erro, por isso este código funciona mesmo que a chave ``'logado'``
 não exista na ``session``.
 
-.. sourcecode:: html+jinja
+.. literalinclude:: ../../examples/flaskr/templates/layout.html
+   :language: html+jinja
 
-  <!doctype html>
-  <title>Flaskr</title>
-  <link rel="stylesheet" type="text/css"
-        href="{{ url_for('static', filename='style.css') }}">
-  <div class="page">
-    <h1>Flaskr</h1>
-    <div class="metanav">
-    {% if not session.logado %}
-      <a href="{{ url_for('login') }}">login</a>
-    {% else %}
-      <a href="{{ url_for('logout') }}">logout</a>
-    {% endif %}
-    </div>
-    {% for mensagem in get_flashed_messages() %}
-      <div class="flash">{{ mensagem }}</div>
-    {% endfor %}
-    {% block corpo %}{% endblock %}
-  </div>
 
 exibir_entradas.html
 --------------------
@@ -63,30 +46,8 @@ Note que o laço `for` itera sobre as entradas que passamos ao invocar a funçã
 logado, exibimos o formulário, que enviará os dados para `inserir_entrada`
 usando o método POST do protocolo HTTP:
 
-.. sourcecode:: html+jinja
-
-  {% extends "layout.html" %}
-  {% block corpo %}
-    {% if session.logado %}
-      <form action="{{ url_for('inserir_entrada') }}" method="post"
-            class="add-entry">
-        <dl>
-          <dt>Título:
-          <dd><input type="text" size="30" name="title">
-          <dt>Texto:
-          <dd><textarea name="text" rows="5" cols="40"></textarea>
-          <dd><input type="submit" value="Publicar">
-        </dl>
-      </form>
-    {% endif %}
-    <ul class="entries">
-    {% for entrada in entradas %}
-      <li><h2>{{ entrada.titulo }}</h2>{{ entrada.texto|safe }}
-    {% else %}
-      <li><em>Inacreditável. Até agora nenhuma entrada.</em>
-    {% endfor %}
-    </ul>
-  {% endblock %}
+.. literalinclude:: ../../examples/flaskr/templates/exibir_entradas.html
+   :language: html+jinja
 
 
 login.html
@@ -94,22 +55,8 @@ login.html
 
 Finalmente, o template de login que apenas exibe o formulário para o usuário se logar:
 
-.. sourcecode:: html+jinja
-
-  {% extends "layout.html" %}
-  {% block body %}
-    <h2>Login</h2>
-    {% if erro %}<p class="erro"><strong>Erro:</strong> {{ erro }}{% endif %}
-    <form action="{{ url_for('login') }}" method=post>
-      <dl>
-        <dt>Username:
-        <dd><input type="text" name="username">
-        <dt>Password:
-        <dd><input type="password" name="password">
-        <dd><input type="submit" value="Login">
-      </dl>
-    </form>
-  {% endblock %}
+.. literalinclude:: ../../examples/flaskr/templates/login.html
+   :language: html+jinja
 
 
 Continue com :ref:`tutorial-css`.
