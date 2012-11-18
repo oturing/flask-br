@@ -44,7 +44,7 @@ mágicas por baixo dos panos para garantir que tudo funcione.
 
 Continue com :ref:`tutorial-views`.
 
-.. hint:: Onde eu coloque este código?
+.. hint:: Onde eu coloco este código?
 
    Se você vem acompanhando este tutorial, talvez esteja em dúvida sobre onde
    colocar o código deste passo e o do próximo. Um lugar lógico é agrupar
