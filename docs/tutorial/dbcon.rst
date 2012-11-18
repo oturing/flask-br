@@ -5,7 +5,7 @@ Passo 4: Conexão ao banco de dados durante uma requisição
 
 Já sabemos como abrir uma conexão de banco de dados para uso em um script ou
 no console interativo, mas como podemos fazê-lo de modo elegante a cada
-requisição Web? Precisaremos conectar com o banco de dados em todas as funções
+requisição Web? A conexão com o banco de dados será usada em várias funções
 então faz sentido abrir a conexão antes de tratar cada requisição e fechar
 depois.
 
