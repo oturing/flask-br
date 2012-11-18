@@ -2,7 +2,7 @@
 {% block corpo %}
   <h2>Login</h2>
   {% if erro %}<p class="erro"><strong>Erro:</strong> {{ erro }}{% endif %}
-  <form action="{{ url_for('login') }}" method=post>
+  <form action="{{ url_for('login') }}" method="post">
     <dl>
       <dt>Username:
       <dd><input type="text" name="username">
