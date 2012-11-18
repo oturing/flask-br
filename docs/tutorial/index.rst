@@ -3,18 +3,22 @@
 Tutorial
 ========
 
-You want to develop an application with Python and Flask?  Here you have
-the chance to learn that by example.  In this tutorial we will create a
-simple microblog application.  It only supports one user that can create
-text-only entries and there are no feeds or comments, but it still
-features everything you need to get started.  We will use Flask and SQLite
-as database which comes out of the box with Python, so there is nothing
-else you need.
+Está a fim de desenvolver uma aplicação com Python e Flask?
 
-If you want the full sourcecode in advance or for comparison, check out
-the `example source`_.
+Aqui está a oportunidade de aprender através de um exemplo. Neste tutorial
+criaremos uma aplicação simples de microblog. Ela suporta apenas um usuário,
+que pode criar entradas com título e um corpo com HTML, e não tem feeds ou
+comentários, mas ainda assim apresenta tudo o que você precisa conhecer para
+começar. Usaremos Flask e o banco de dados SQLite3, que vem junto com o
+Python, então você não precisará de mais nada.
 
-.. _example source:
+Se quiser ver o código-fonte completo como ficará no final, veja o
+`exemplo traduzido`_ (ou `exemplo original`_ em inglês).
+
+.. _exemplo traduzido:
+   http://github.com/oturing/flask-br/tree/master/examples/flaskr/
+
+.. _exemplo original:
    http://github.com/mitsuhiko/flask/tree/master/examples/flaskr/
 
 .. toctree::
