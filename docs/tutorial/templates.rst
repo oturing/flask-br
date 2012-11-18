@@ -1,111 +1,115 @@
 .. _tutorial-templates:
 
-Step 6: The Templates
-=====================
+Passo 6: Templates
+==================
 
-Now we should start working on the templates.  If we request the URLs now
-we would only get an exception that Flask cannot find the templates.  The
-templates are using `Jinja2`_ syntax and have autoescaping enabled by
-default.  This means that unless you mark a value in the code with
-:class:`~flask.Markup` or with the ``|safe`` filter in the template,
-Jinja2 will ensure that special characters such as ``<`` or ``>`` are
-escaped with their XML equivalents.
+Agora vamos começar a trabalhar nos templates (modelos de página). Se acessar
+as URLs definidas até agora apenas veremos exceções pois o Flask não consegue
+encontrar os templates. Os templates neste exemplo usam a sintaxe `Jinja2`_ e
+têm *autoescaping* ativado por default. Isso significa que Jinja2 substituirá
+caracteres especiais como ``<`` ou ``>`` pelas entidades XML equivalentes
+(ex.: ``&lt;``), a não ser que você forneça o valor usando a classe
+:class:`~flask.Markup` ou use o filtro ``|safe`` no template.
 
-We are also using template inheritance which makes it possible to reuse
-the layout of the website in all pages.
+Também usaremos herança de templates, possibilitando o reuso do layout básico
+do site em todas as páginasa.
 
-Put the following templates into the `templates` folder:
+Coloque os templates a seguir no diretório `flaskr/templates`:
 
 .. _Jinja2: http://jinja.pocoo.org/2/documentation/templates
 
 layout.html
 -----------
 
-This template contains the HTML skeleton, the header and a link to log in
-(or log out if the user was already logged in).  It also displays the
-flashed messages if there are any.  The ``{% block body %}`` block can be
-replaced by a block of the same name (``body``) in a child template.
+Este template contém o esqueleto do HTML, um cabeçalho e uma link para fazer
+login (ou logout, se o usuário já estiver logado). Também exibe as mensagens
+produzidas pela função `flash`, se existirem. O bloco ``{% block corpo %}``
+pode ser substituído por um bloco de mesmo nome (``corpo``) em um template
+derivado deste.
 
-The :class:`~flask.session` dict is available in the template as well and
-you can use that to check if the user is logged in or not.  Note that in
-Jinja you can access missing attributes and items of objects / dicts which
-makes the following code work, even if there is no ``'logged_in'`` key in
-the session:
+O dict :class:`~flask.session` está disponível para o template também, e pode
+ser usado para verificar se o usuário está logado ou não. Note que no Jinga
+você pode acessar atributos ou itens inexistentes em objetos e coleções sem
+disparar um erro, por isso este código funciona mesmo que a chave ``'logado'``
+não exista na ``session``.
 
 .. sourcecode:: html+jinja
 
-    <!doctype html>
-    <title>Flaskr</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-    <div class=page>
-      <h1>Flaskr</h1>
-      <div class=metanav>
-      {% if not session.logged_in %}
-        <a href="{{ url_for('login') }}">log in</a>
-      {% else %}
-        <a href="{{ url_for('logout') }}">log out</a>
-      {% endif %}
-      </div>
-      {% for message in get_flashed_messages() %}
-        <div class=flash>{{ message }}</div>
-      {% endfor %}
-      {% block body %}{% endblock %}
+  <!doctype html>
+  <title>Flaskr</title>
+  <link rel="stylesheet" type="text/css"
+        href="{{ url_for('static', filename='style.css') }}">
+  <div class="page">
+    <h1>Flaskr</h1>
+    <div class="metanav">
+    {% if not session.logado %}
+      <a href="{{ url_for('login') }}">login</a>
+    {% else %}
+      <a href="{{ url_for('logout') }}">logout</a>
+    {% endif %}
     </div>
+    {% for mensagem in get_flashed_messages() %}
+      <div class="flash">{{ mensagem }}</div>
+    {% endfor %}
+    {% block corpo %}{% endblock %}
+  </div>
 
-show_entries.html
------------------
+exibir_entradas.html
+--------------------
 
-This template extends the `layout.html` template from above to display the
-messages.  Note that the `for` loop iterates over the messages we passed
-in with the :func:`~flask.render_template` function.  We also tell the
-form to submit to your `add_entry` function and use `POST` as `HTTP`
-method:
+Este template extende o `layout.html` acima para exibir as entradas do blog.
+Note que o laço `for` itera sobre as entradas que passamos ao invocar a função
+:func:`~flask.render_template` na view `exibir_entradas`. Se o usuário estiver
+logado, exibimos o formulário, que enviará os dados para `inserir_entrada`
+usando o método POST do protocolo HTTP:
 
 .. sourcecode:: html+jinja
 
-    {% extends "layout.html" %}
-    {% block body %}
-      {% if session.logged_in %}
-        <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-          <dl>
-            <dt>Title:
-            <dd><input type=text size=30 name=title>
-            <dt>Text:
-            <dd><textarea name=text rows=5 cols=40></textarea>
-            <dd><input type=submit value=Share>
-          </dl>
-        </form>
-      {% endif %}
-      <ul class=entries>
-      {% for entry in entries %}
-        <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
-      {% else %}
-        <li><em>Unbelievable.  No entries here so far</em>
-      {% endfor %}
-      </ul>
-    {% endblock %}
+  {% extends "layout.html" %}
+  {% block corpo %}
+    {% if session.logado %}
+      <form action="{{ url_for('inserir_entrada') }}" method="post"
+            class="add-entry">
+        <dl>
+          <dt>Título:
+          <dd><input type="text" size="30" name="title">
+          <dt>Texto:
+          <dd><textarea name="text" rows="5" cols="40"></textarea>
+          <dd><input type="submit" value="Publicar">
+        </dl>
+      </form>
+    {% endif %}
+    <ul class="entries">
+    {% for entrada in entradas %}
+      <li><h2>{{ entrada.titulo }}</h2>{{ entrada.texto|safe }}
+    {% else %}
+      <li><em>Inacreditável. Até agora nenhuma entrada.</em>
+    {% endfor %}
+    </ul>
+  {% endblock %}
+
 
 login.html
 ----------
 
-Finally the login template which basically just displays a form to allow
-the user to login:
+Finalmente, o template de login que apenas exibe o formulário para o usuário se logar:
 
 .. sourcecode:: html+jinja
 
-    {% extends "layout.html" %}
-    {% block body %}
-      <h2>Login</h2>
-      {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-      <form action="{{ url_for('login') }}" method=post>
-        <dl>
-          <dt>Username:
-          <dd><input type=text name=username>
-          <dt>Password:
-          <dd><input type=password name=password>
-          <dd><input type=submit value=Login>
-        </dl>
-      </form>
-    {% endblock %}
+  {% extends "layout.html" %}
+  {% block body %}
+    <h2>Login</h2>
+    {% if erro %}<p class="erro"><strong>Erro:</strong> {{ erro }}{% endif %}
+    <form action="{{ url_for('login') }}" method=post>
+      <dl>
+        <dt>Username:
+        <dd><input type="text" name="username">
+        <dt>Password:
+        <dd><input type="password" name="password">
+        <dd><input type="submit" value="Login">
+      </dl>
+    </form>
+  {% endblock %}
 
-Continue with :ref:`tutorial-css`.
+
+Continue com :ref:`tutorial-css`.

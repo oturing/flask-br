@@ -1,98 +1,97 @@
 .. _tutorial-views:
 
-Step 5: The View Functions
-==========================
+Passo 5: As funções de view
+===========================
 
-Now that the database connections are working we can start writing the
-view functions.  We will need four of them:
+Agora que a conexão com o banco de dados está funcionando, podemos começar a
+escrever as funções de *view*, que geram o corpo das respostas HTTP. Vamos
+precisar de quatro funções:
 
-Show Entries
-------------
+Exibir entradas
+---------------
 
-This view shows all the entries stored in the database.  It listens on the
-root of the application and will select title and text from the database.
-The one with the highest id (the newest entry) will be on top.  The rows
-returned from the cursor are tuples with the columns ordered like specified
-in the select statement.  This is good enough for small applications like
-here, but you might want to convert them into a dict.  If you are
-interested in how to do that, check out the :ref:`easy-querying` example.
+Esta view mostra todas as entradas armazenadas no banco de dados. Ela recebe
+requisições feitas na raiz do aplicativo (`/`) e seleciona o título e o texto
+das entradas no banco de dados. Aquela com o maior `id` (a entrada mais
+recente) vai aparecer no topo. Os registros devolvidos pelo cursor são tuplas
+com as colunas ordenadas conforme enumeradas no comando `select`. Isso basta
+para uma aplicação pequena como esta, mas às vezes pode ser interessante obter
+os registros como dicionários. Se estiver interessado em ver como se faz isso,
+dê uma olhada no exemplo em :ref:`easy-querying`.
 
-The view function will pass the entries as dicts to the
-`show_entries.html` template and return the rendered one::
+A função view renderiza o template `show_entries.html` passando as entradas como uma lista de dicts::
 
     @app.route('/')
-    def show_entries():
-        cur = g.db.execute('select title, text from entries order by id desc')
-        entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
-        return render_template('show_entries.html', entries=entries)
+    def exibir_entradas():
+        sql = '''select titulo, texto from entriadas order by id desc'''
+        cur = g.db.execute(sql)
+        entradas = [dict(titulo=titulo, texto=texto)
+                        for titulo, texto in cur.fetchall()]
+        return render_template('exibir_entradas.html', entradas=entradas)
 
-Add New Entry
--------------
+Inserir entrada
+---------------
 
-This view lets the user add new entries if they are logged in.  This only
-responds to `POST` requests, the actual form is shown on the
-`show_entries` page.  If everything worked out well we will
-:func:`~flask.flash` an information message to the next request and
-redirect back to the `show_entries` page::
+Esta view permite que o usuário insira uma nova entrada se ele estiver logado. Ela responde apenas a requisições HTTP POST, pois o formulário é exibido no template de `exibir_entradas`. Se tudo funcionou bem, usaremos a função
+:func:`~flask.flash` para exibir uma mensagem informativa na próxima resposta e redirecionar para a página `exibir_entradas`::
 
-    @app.route('/add', methods=['POST'])
-    def add_entry():
-        if not session.get('logged_in'):
+    @app.route('/inserir', methods=['POST'])
+    def inserir_entrada():
+        if not session.get('logado'):
             abort(401)
-        g.db.execute('insert into entries (title, text) values (?, ?)',
-                     [request.form['title'], request.form['text']])
+        sql = '''insert into entradas (titulo, texto) values (?, ?)'''
+        g.db.execute(sql, [request.form['titulo'], request.form['texto']])
         g.db.commit()
-        flash('New entry was successfully posted')
-        return redirect(url_for('show_entries'))
+        flash('Nova entrada registrada com sucesso')
+        return redirect(url_for('exibir_entradas'))
 
-Note that we check that the user is logged in here (the `logged_in` key is
-present in the session and `True`).
+Note que verificamos se o usuário está logado (a chave `logado` está
+presente na sessão e seu valor é `True`).
 
-.. admonition:: Security Note
+.. admonition:: Observação de segurança
 
-   Be sure to use question marks when building SQL statements, as done in the
-   example above.  Otherwise, your app will be vulnerable to SQL injection when
-   you use string formatting to build SQL statements.
-   See :ref:`sqlite3` for more.
+   Assegure-se de usar sempre as interrogações `?` ao construir comandos SQL
+   parametrizados, como feito no exemplo acima. Se em vez disso você construir
+   o SQL concatenando ou interpolando strings, sua aplicação será vulnerável a
+   ataques de injeção de SQL. Veja :ref:`sqlite3` para saber mais.
 
-Login and Logout
-----------------
+Login e logout
+--------------
 
-These functions are used to sign the user in and out.  Login checks the
-username and password against the ones from the configuration and sets the
-`logged_in` key in the session.  If the user logged in successfully, that
-key is set to `True`, and the user is redirected back to the `show_entries`
-page.  In addition, a message is flashed that informs the user that he or
-she was logged in successfully.  If an error occurred, the template is
-notified about that, and the user is asked again::
+Estas funções são usadas para logar e deslogar o usuário. A função `login`
+compara o nome de usuário e a senha com as credenciais configuradas e define a
+chave `logado` na sessão. Se o usuário se logou com sucesso, o valor da chave
+`logado` é definido como `True`, e o usuário é redirecionado para a página
+`exibir_entradas`. Além disso, na próxima página aparecerá uma mensagem
+confirmando que o usário se logou. Se ocorrer um erro, uma mensagem de erro é
+passada para o template, e a página de login é exibida novamente::
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
-        error = None
+        erro = None
         if request.method == 'POST':
             if request.form['username'] != app.config['USERNAME']:
-                error = 'Invalid username'
+                error = 'Usuário inválido'
             elif request.form['password'] != app.config['PASSWORD']:
-                error = 'Invalid password'
+                error = 'Senha inválida'
             else:
-                session['logged_in'] = True
-                flash('You were logged in')
-                return redirect(url_for('show_entries'))
-        return render_template('login.html', error=error)
+                session['logado'] = True
+                flash('Login OK')
+                return redirect(url_for('exibir_entradas'))
+        return render_template('login.html', erro=erro)
 
-The logout function, on the other hand, removes that key from the session
-again.  We use a neat trick here: if you use the :meth:`~dict.pop` method
-of the dict and pass a second parameter to it (the default), the method
-will delete the key from the dictionary if present or do nothing when that
-key is not in there.  This is helpful because now we don't have to check
-if the user was logged in.
+A função de saída, por outro lado, retira a chave `logado` da sessão. Aqui
+usamos um truque: invocando o método meth:`~dict.pop` do dict e passando um
+segundo parâmetro (o default), o método excluirá a chave do dicionário se
+presente, ou não fará nada se ela não estiver lá. Isso é útil porque assim não
+temos de verificar se o usuário já estava logado.
 
 ::
 
     @app.route('/logout')
     def logout():
-        session.pop('logged_in', None)
-        flash('You were logged out')
-        return redirect(url_for('show_entries'))
+        session.pop('logado', None)
+        flash('Logout OK')
+        return redirect(url_for('exibir_entradas'))
 
-Continue with :ref:`tutorial-templates`.
+Continue com :ref:`tutorial-templates`.
