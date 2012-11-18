@@ -1,90 +1,95 @@
 .. _tutorial-setup:
 
-Step 2: Application Setup Code
-==============================
+Passo 2: Inicialização da aplicação
+===================================
 
-Now that we have the schema in place we can create the application module.
-Let's call it `flaskr.py` inside the `flaskr` folder.  For starters we
-will add the imports we will need as well as the config section.  For
-small applications it's a possibility to drop the configuration directly
-into the module which we will be doing here.  However a cleaner solution
-would be to create a separate `.ini` or `.py` file and load that or import
-the values from there.
+Agora que temos um esquema definido, podemos criar o módulo da aplicação.
+Vamos chamá-lo de `flaskr.py` dentro da pasta `flaskr`. Para começar vamos
+escrever os imports que necessários e um trecho de configuração. Para uma
+aplicação pequena é possível embutir a configuração no módulo como faremos
+aqui. No entanto uma solução mais limpa seria criar um arquivo `.ini` ou `.py`
+e carregar ou importar os dados de lá.
 
-In `flaskr.py`::
+Dentro de `flaskr.py`::
 
-    # all the imports
+    # coding: utf-8
+
+    # todos os imports
     import sqlite3
     from flask import Flask, request, session, g, redirect, url_for, \
          abort, render_template, flash
 
-    # configuration
+    # configuração
     DATABASE = '/tmp/flaskr.db'
     DEBUG = True
     SECRET_KEY = 'development key'
     USERNAME = 'admin'
     PASSWORD = 'default'
 
-Next we can create our actual application and initialize it with the
-config from the same file, in `flaskr.py`::
+Em seguinda criamos nossa aplicação propriamente dita e a inicializamos com a configuração do próprio arquivo, ainda em `flaskr.py`::
 
-    # create our little application :)
+    # criar nossa pequena aplicação :)
     app = Flask(__name__)
     app.config.from_object(__name__)
 
-:meth:`~flask.Config.from_object` will look at the given object (if it's a
-string it will import it) and then look for all uppercase variables
-defined there.  In our case, the configuration we just wrote a few lines
-of code above.  You can also move that into a separate file.
+O método :meth:`~flask.Config.from_object` inspeciona o objeto fornecido (se
+for uma string, ele importa o módulo correspondente) e lê todas as variáveis
+com nomes em maiúsculas encontrados nele. Em nosso caso, são as variáveis de
+configuração que escremos logo acima. Você também pode colocá-las em outro
+arquivo.
 
-Usually, it is a good idea to load a configuration from a configurable
-file. This is what :meth:`~flask.Config.from_envvar` can do, replacing the
-:meth:`~flask.Config.from_object` line above::
+Geralmente, é uma boa idéia carregar a configuração de um arquivo específico
+para este fim. É isto que o método :meth:`~flask.Config.from_envvar` faz, no
+lugar de da linha com :meth:`~flask.Config.from_object` acima::
 
-    app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+    app.config.from_envvar('CONFIG_FLASKR', silent=True)
 
-That way someone can set an environment variable called
-:envvar:`FLASKR_SETTINGS` to specify a config file to be loaded which will then
-override the default values. The silent switch just tells Flask to not complain
-if no such environment key is set.
+Desta forma alguém pode setar uma variável de ambiente chamada
+:envvar:`CONFIG_FLASKR` para especificar um arquivo de configuração da ser
+carregado para sobrescrever os parâmetros da configuração default. A opção
+`silent` diz para o Flask não reclamar se tal variável de ambiente não
+existir.
 
-The `secret_key` is needed to keep the client-side sessions secure.
-Choose that key wisely and as hard to guess and complex as possible.  The
-debug flag enables or disables the interactive debugger.  *Never leave
-debug mode activated in a production system*, because it will allow users to
-execute code on the server!
+A `SECRET_KEY` é necessária para manter as sessões do cliente seguras. Escolha
+bem esta chave e assegure-se de que ela é bastante complicada e difícil de
+adivinhar. A opção `DEBUG` liga ou desliga o depurador interativo. *Nunca
+deixe o modo debug ligado em um sistema em produção*, pois isso permite que os
+usuários executem comandos arbitrários em seu servidor!
 
-We also add a method to easily connect to the database specified.  That
-can be used to open a connection on request and also from the interactive
-Python shell or a script.  This will come in handy later.
+Tambem criamos um método para facilitar a conexão ao banco de dados
+especificado. Isso pode ser usado para abrir uma conexão ao tratarmos uma
+requisiçao e também através do console do Python o de algum script. Isso
+facilitará as coisas depois.
 
 ::
 
-    def connect_db():
+    def conectar_bd():
         return sqlite3.connect(app.config['DATABASE'])
 
-Finally we just add a line to the bottom of the file that fires up the
-server if we want to run that file as a standalone application::
+Finalmente, acrescentamos uma linha no final do arquivo que dispara o servidor
+caso este módulo seja usado como uma aplicação independente::
 
     if __name__ == '__main__':
         app.run()
 
-With that out of the way you should be able to start up the application
-without problems.  Do this with the following command::
+
+Feito isso, você deverá ser capaz de iniciar a aplicação sem nenhum problema.
+Faça isto com o seguinte comando::
 
    python flaskr.py
 
-You will see a message telling you that server has started along with
-the address at which you can access it.
+Você verá uma mensagem dizendo que o servidor foi iniciado e informando o
+endereço onde poderá acessá-lo.
 
-When you head over to the server in your browser you will get an 404
-page not found error because we don't have any views yet.  But we will
-focus on that a little later.  First we should get the database working.
+Se visitar com seu navegador o endereço exibido, verá uma página de erro 404
+porque ainda não conifiguramos nenhuma *view*. Vamos resolver isso mais tarde.
+Primeiro, queremos fazer o banco de dados funcionar.
 
-.. admonition:: Externally Visible Server
 
-   Want your server to be publicly available?  Check out the
-   :ref:`externally visible server <public-server>` section for more
-   information.
+.. admonition:: Servidor visível externamente
 
-Continue with :ref:`tutorial-dbinit`.
+   Quer que o seu servidor esteja disponível para outros via rede?
+   Leia a seção :ref:`externally visible server <public-server>`
+   para mais informações.
+
+Continue com :ref:`tutorial-dbinit`.

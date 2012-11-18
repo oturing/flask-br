@@ -1,25 +1,25 @@
 .. _tutorial-schema:
 
-Step 1: Database Schema
-=======================
+Passo 1: O esquema do banco de dados
+====================================
 
-First we want to create the database schema.  For this application only a
-single table is needed and we only want to support SQLite so that is quite
-easy.  Just put the following contents into a file named `schema.sql` in
-the just created `flaskr` folder:
+Primeiro vamos criar o esquema do banco de dados. Para esta aplicação
+precisamos de apenas uma tabela e vamos usar somente SQLite então isto é bem
+fácil. Coloque o código a seguir num arquivo chamado `esquema.sql` na pasta
+`flaskr` que acabou de criar:
 
 .. sourcecode:: sql
 
-    drop table if exists entries;
-    create table entries (
+    drop table if exists entradas;
+    create table entradas (
       id integer primary key autoincrement,
-      title string not null,
-      text string not null
+      titulo string not null,
+      texto string not null
     );
 
-This schema consists of a single table called `entries` and each row in
-this table has an `id`, a `title` and a `text`.  The `id` is an
-automatically incrementing integer and a primary key, the other two are
-strings that must not be null.
+Este esquema consiste de uma única tabela chamada `entradas` e cada registro
+nessa tabela tem um `id`, um `título` e um `texto`. O `id` é um inteiro
+automaticamente incrementado e uma chave primária, e os outros dois campos
+são strings e não podem ser nulos.
 
-Continue with :ref:`tutorial-setup`.
+Continue com :ref:`tutorial-setup`.

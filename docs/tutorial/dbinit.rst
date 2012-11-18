@@ -1,69 +1,79 @@
 .. _tutorial-dbinit:
 
-Step 3: Creating The Database
-=============================
+Passo 3: Criando o banco de dados
+=================================
 
-Flaskr is a database powered application as outlined earlier, and more
-precisely, an application powered by a relational database system.  Such
-systems need a schema that tells them how to store that information. So
-before starting the server for the first time it's important to create
-that schema.
+Flaskr é uma aplicação movida a banco de dados, conforme já descrevemos, e,
+mais precisamente, é uma aplicação baseada em um sistema de banco de dados
+relacional. Tais sistemas precisam de um esquema que define como os dados
+devem ser armazenados. Assim, antes de iniciar o servidor pela primeira vez é
+preciso criar o tal esquema.
 
-Such a schema can be created by piping the `schema.sql` file into the
-`sqlite3` command as follows::
+O esquema pode ser criado redirecionando o arquivo `esquema.sql` para o
+comando `sqlite3` desta forma::
 
-    sqlite3 /tmp/flaskr.db < schema.sql
+    sqlite3 /tmp/flaskr.db < esquema.sql
 
-The downside of this is that it requires the sqlite3 command to be
-installed which is not necessarily the case on every system.  Also one has
-to provide the path to the database there which leaves some place for
-errors.  It's a good idea to add a function that initializes the database
-for you to the application.
 
-If you want to do that, you first have to import the
-:func:`contextlib.closing` function from the contextlib package.  If you
-want to use Python 2.5 it's also necessary to enable the `with` statement
-first (`__future__` imports must be the very first import). Accordingly,
-add the following lines to your existing imports in `flaskr.py`::
+A desvantagem de fazer assim é que precisamos usar o comando sqlite3 que pode
+não estar instalado em algum ambiente. Além disso, temos que fornecer
+novamente o caminho para o banco de dados, correndo o risco de errar. É uma
+boa idéia criar uma função que inicializa o banco de dados na própria
+aplicação.
+
+Para fazer isso, primeiro precisamos importar a função
+:func:`contextlib.closing` do pacote `contextlib`. Se precisar usar Python
+2.5, também será necessário habilitar o comando `with` (lembre-se que um
+import de `__future__` deve ser o primeiro import em um módulo). Conforme o
+caso, coloque essas duas linhas em seu `flaskr.py`, ou apenas a segunda se
+estiver usando Python 2.6 ou 2.7::
 
     from __future__ import with_statement
     from contextlib import closing
 
-Next we can create a function called `init_db` that initializes the
-database.  For this we can use the `connect_db` function we defined
-earlier.  Just add that function below the `connect_db` function in
-`flaskr.py`::
+Agora podemos criar uma função chamada `criar_bd` que inicializa o banco de
+dados. Para isso podemos usar a função `conectar_bd` que definimos antes.
+Coloque esta função abaixo da função `conectar_bd` em `flaskr.py`::
 
-    def init_db():
-        with closing(connect_db()) as db:
-            with app.open_resource('schema.sql') as f:
-                db.cursor().executescript(f.read())
-            db.commit()
+    def criar_bd():
+        with closing(conectar_bd()) as bd:
+            with app.open_resource('esquema.sql') as sql:
+                bd.cursor().executescript(sql.read())
+            bd.commit()
 
-The :func:`~contextlib.closing` helper function allows us to keep a
-connection open for the duration of the `with` block.  The
-:func:`~flask.Flask.open_resource` method of the application object
-supports that functionality out of the box, so it can be used in the
-`with` block directly.  This function opens a file from the resource
-location (your `flaskr` folder) and allows you to read from it.  We are
-using this here to execute a script on the database connection.
+A função auxiliar :func:`~contextlib.closing` permite que nossa aplicação
+mantenha a conexão aberta enquando o bloco `with` é executado [#]_. O método
+:func:`~flask.Flask.open_resource` do objeto aplicação já implementa esta
+funcionalidade, por isso pode ser usado diretamente no segundo comando `with`.
+Esta função abre para leitura um arquivo do local dos recursos (a pasta
+`flaskr`). Neste caso estamos abrindo um script SQL para executá-lo através da conexão com o banco de dados.
 
-When we connect to a database we get a connection object (here called
-`db`) that can give us a cursor.  On that cursor there is a method to
-execute a complete script.  Finally we only have to commit the changes.
-SQLite 3 and other transactional databases will not commit unless you
-explicitly tell it to.
 
-Now it is possible to create a database by starting up a Python shell and
-importing and calling that function::
+Quando conectamos a um banco de dados obtemos um objeto conexão (aqui
+denominado `bd`) que pode nos fornecer um cursor. No cursor existe um método
+para executar um script SQL completo. Finalmente, precisamos fazer `commit`
+nas alterações. SQLite3 e outros bancos de dados transacionais não fazem
+`commit` a menos que você solicite explicitamente.
 
->>> from flaskr import init_db
->>> init_db()
+Agora podemos criar o banco de dados iniciando um console do Python, importando e invocando aquela função::
 
-.. admonition:: Troubleshooting
+>>> from flaskr import criar_bd()
+>>> criar_bd()
 
-   If you get an exception later that a table cannot be found check that
-   you did call the `init_db` function and that your table names are
-   correct (singular vs. plural for example).
+.. admonition:: Em caso de erro
 
-Continue with :ref:`tutorial-dbcon`
+   Se posteriormente você encontrar uma exceção de que a tabela não foi
+   encontrada, verifique que você invocou a função `criar_db` sem erros
+   e que o nome da tabela está correto (ex.: singular e não plural).
+
+
+Continue com :ref:`tutorial-dbcon`
+
+.. rubric:: Notas da tradução
+
+.. [#] Além disso, a função `closing` garante que o recurso aberto seja
+   fechado ao final do bloco `with`. Isso é crucial quando usamos o SQLite3,
+   pois ao contrário de um servidor de banco de dados rodando em um processo
+   independente, o SQLite3 é gerenciado diretamente pela sua aplicação e se
+   ela abortar sem fechar a conexão, o arquivo de banco de dados ficará
+   travado, exigindo uma intervenção manual antes de ser acessado novamente.

@@ -1,23 +1,23 @@
 .. _tutorial-folders:
 
-Step 0: Creating The Folders
-============================
+Passo 0: Criando os diretórios
+==============================
 
-Before we get started, let's create the folders needed for this
-application::
+Antes de começar, vamos criar os diretórios necessários para esta
+aplicação::
 
     /flaskr
         /static
         /templates
 
-The `flaskr` folder is not a python package, but just something where we
-drop our files.  Directly into this folder we will then put our database
-schema as well as main module in the following steps.  The files inside
-the `static` folder are available to users of the application via `HTTP`.
-This is the place where css and javascript files go.  Inside the
-`templates` folder Flask will look for `Jinja2`_ templates.  The
-templates you create later in the tutorial will go in this directory.
+A pasta `flaskr` não é um pacote Python, mas apenas um lugar para colocarmos
+nossos arquivos. Diretamente nesta pasta colocaremos os arquivos de dados bem
+como o módulo principal nos passos seguintes. Os arquivos dentro da pasta
+`static` estão disponíveis para os usuários da aplicação via HTTP. Este é
+o lugar onde colocaremos os arquivos CSS e JavaScript. O Flask buscará na
+pasta `templates` os templates `Jinja2`_. Os templates que criaremos
+posteriormente no tutorial irão para este diretório.
 
-Continue with :ref:`tutorial-schema`.
+Continue com :ref:`tutorial-schema`.
 
 .. _Jinja2: http://jinja.pocoo.org/2/

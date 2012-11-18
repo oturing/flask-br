@@ -1,33 +1,35 @@
 .. _tutorial-introduction:
 
-Introducing Flaskr
-==================
+Apresentando Flaskr
+====================
 
-We will call our blogging application flaskr here, feel free to choose a
-less web-2.0-ish name ;)  Basically we want it to do the following things:
+Vamos chamar de flaskr nossa aplicação de blog, mas fique à vontade pare
+escolher um nome menos "web-2.0" ;)  Basicamente queremos que a aplicação faça
+o seguinte:
 
-1. let the user sign in and out with credentials specified in the
-   configuration.  Only one user is supported.
-2. when the user is logged in they can add new entries to the page
-   consisting of a text-only title and some HTML for the text.  This HTML
-   is not sanitized because we trust the user here.
-3. the page shows all entries so far in reverse order (newest on top) and
-   the user can add new ones from there if logged in.
 
-We will be using SQLite3 directly for that application because it's good
-enough for an application of that size.  For larger applications however
-it makes a lot of sense to use `SQLAlchemy`_ that handles database
-connections in a more intelligent way, allows you to target different
-relational databases at once and more.  You might also want to consider
-one of the popular NoSQL databases if your data is more suited for those.
+1. permitir que o usuário se logue e deslogue utilizando credenciais
+   especificadas na configuração. Somente um usuário é suportado.
+2. quando o usuário está logado ele pode criar novas entradas no blog,
+   que consistem de um título em texto puro e um corpo em HTML. Este
+   HTML não passa por nenhum filtro pois confiamos no nosso usuário.
+3. a página exibe todas as entradas até o momento em ordem inversa
+   (as mais recente no topo) e o usuário pode criar novas entradas
+   na página se estiver logado.
 
-Here a screenshot from the final application:
+Usaremos SQLite3 diretamente para esta aplicação porque ele é bom o bastante
+para uma aplicação deste tamanho. Para aplicações maiores entretanto faz
+sentido usar `SQLAlchemy`_ que lida com conexões ao banco de dados de forma
+mais inteligente, permite acessar vários bancos de dados diferentes e oferece
+muitas outras facilidades.
+
+Eis uma tela da aplicação final:
 
 .. image:: ../_static/flaskr.png
    :align: center
    :class: screenshot
-   :alt: screenshot of the final application
+   :alt: tela da aplicação concluída
 
-Continue with :ref:`tutorial-folders`.
+Continue com :ref:`tutorial-folders`.
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/

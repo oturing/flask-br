@@ -185,12 +185,12 @@ Feito isso, pode continuar a partir de `Criando um ambiente para seu projeto`_.
 .. rubric:: Notas da tradução
 
 .. [#] A especificação WSGI adaptada para Python 3 foi publicada como
-   `PEP 3333`_ em setembro de 2010. No final de 2012 vários frameworks
+   `PEP 3333`_ em setembro de 2010. Em novembro de 2012 vários frameworks
    Python já suportam ou estão em estágio adiantado de desenvolvimento
-   para suportar o Python 3. Ao mesmo tempo, embora o Flask continua
+   para suportar o Python 3. Ao mesmo tempo, embora o Flask continue
    sendo ativamente atualizado pelo autor no Github, a biblioteca
-   Werkzeug, onde está a maior parte da dificuldade na migração para Python
-   3, teve pouca atividade em 2012. Em agosto de 2012 Armin Ronacher,
+   Werkzeug teve pouca atividade em 2012, e é nela que está a maior parte da
+   dificuldade na migração para Python 3. Em agosto de 2012 Armin Ronacher,
    autor do Flask e do Werkzeug, escreveu "Entretanto, com com Python 3
    tornando-se cada vez mais interessante, atualmente estou brincando com
    algumas idéias para evoluir as bibliotecas de maneiras interessantes."
