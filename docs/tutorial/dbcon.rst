@@ -35,7 +35,7 @@ processamento da requisição, cada função marcada com `teardown_request` rece
 a exceção; do contrário, elas recebem `None`.
 
 Armazenamos a conexão de banco de dados aberta no objeto especial
-:data:`~flask.g` que o Flask forence. Este objeto armazena informaçõoes apenas
+:data:`~flask.g` que o Flask fornece. Este objeto armazena informaçõoes apenas
 pela duração de uma requisição e está disponível para cada uma de suas
 funções. Nunca armazene tais coisas em outros objetos, pois poderá ter
 problemas em ambientes multi-thread. O objeto :data:`~flask.g` faz algumas
