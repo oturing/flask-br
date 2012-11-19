@@ -1,36 +1,38 @@
 .. _testing:
 
-Testing Flask Applications
-==========================
+Testando aplicações Flask
+=========================
 
-   **Something that is untested is broken.**
+   **Qualquer coisa sem testes está quebrada.**
 
-The origin of this quote is unknown and while it is not entirely correct, it is also
-not far from the truth.  Untested applications make it hard to
-improve existing code and developers of untested applications tend to
-become pretty paranoid.  If an application has automated tests, you can
-safely make changes and instantly know if anything breaks.
+A origem desta citação é desenconhecida, e embora não esteja completamente
+certa, também não está longe da verdade. Apliações sem testes tornam difícil
+melhorar o código existente e desenvolvedores de aplicações sem testes tendem
+a ficar bastante paranóicos. Se sua aplicação tem testes automatizados, você pode fazer alterações com segurança pois saberá imediatamente se algo quebrou.
 
-Flask provides a way to test your application by exposing the Werkzeug 
-test :class:`~werkzeug.test.Client` and handling the context locals for you.
-You can then use that with your favourite testing solution.  In this documentation
-we will use the :mod:`unittest` package that comes pre-installed with Python.
+Flask fornece uma forma de testar sua aplicação dando acesso ao
+:class:`~werkzeug.test.Client` da biblioteca Werkzeug, e gerenciando as
+variáveis locais do contexto para você. Com isso você pode usar a sua solução
+favorita para testes. Nesta documentação, usaremos o pacote :mod:`unittest`
+que vem pré-instalado com o Python.
 
-The Application
----------------
+A aplicação
+-----------
 
-First, we need an application to test; we will use the application from 
-the :ref:`tutorial`.  If you don't have that application yet, get the 
-sources from `the examples`_.
+Primeiro, precisamos de uma aplicação para testar; usaremos a aplicação do
+:ref:`tutorial`. Se você ainda não tem essa aplicação, pegue o código fonte do
+`exemplo traduzido`_.
 
-.. _the examples:
-   http://github.com/mitsuhiko/flask/tree/master/examples/flaskr/
+.. _exemplo traduzido:
+   http://github.com/ramalho/flask-br/tree/master/examples/flaskr/
 
-The Testing Skeleton
---------------------
+O esqueleto dos testes
+----------------------
 
-In order to test the application, we add a second module 
-(`flaskr_tests.py`) and create a unittest skeleton there::
+Para testar a aplicação, criaremos um segundo módulo (`flaskr_tests.py`) e
+nele montaremos o esqueleto dos testes unitários::
+
+    # coding: utf-8
 
     import os
     import flaskr
@@ -40,39 +42,36 @@ In order to test the application, we add a second module
     class FlaskrTestCase(unittest.TestCase):
 
         def setUp(self):
-            self.db_fd, flaskr.app.config['DATABASE'] = tempfile.mkstemp()
+            self.bd_arq, flaskr.app.config['DATABASE'] = tempfile.mkstemp()
             flaskr.app.config['TESTING'] = True
             self.app = flaskr.app.test_client()
-            flaskr.init_db()
+            flaskr.criar_bd()
 
         def tearDown(self):
-            os.close(self.db_fd)
+            os.close(self.bd_arq)
             os.unlink(flaskr.app.config['DATABASE'])
 
     if __name__ == '__main__':
         unittest.main()
 
-The code in the :meth:`~unittest.TestCase.setUp` method creates a new test
-client and initializes a new database.  This function is called before
-each individual test function is run.  To delete the database after the 
-test, we close the file and remove it from the filesystem in the
-:meth:`~unittest.TestCase.tearDown` method.  Additionally during setup the
-``TESTING`` config flag is activated.  What it does is disabling the error
-catching during request handling so that you get better error reports when
-performing test requests against the application.
 
-This test client will give us a simple interface to the application.  We can 
-trigger test requests to the application, and the client will also keep track 
-of cookies for us.
+O código no método :meth:`~unittest.TestCase.setUp` cria um novo cliente de
+testes (``test_client``) e inicializa um novo banco de dados. Este método é
+invocado antes da execução de cada método de teste na classe
+``FlaskrTestCase`` (ainda não escrevemos nenhum teste). Para excluir o banco
+de dados após cada teste, fechamos o arquivo e o apagamos do disco em
+:meth:`~unittest.TestCase.tearDown`. Além disso, no ``setUp``, a configuração
+``TESTING`` é ligada. Isso desabilita a captura de erros durante o tratamento
+das requisições, gerando relatórios de erros melhores quando fazemos
+requisições de teste.
 
-Because SQLite3 is filesystem-based we can easily use the tempfile module
-to create a temporary database and initialize it.  The
-:func:`~tempfile.mkstemp` function does two things for us: it returns a
-low-level file handle and a random file name, the latter we use as
-database name.  We just have to keep the `db_fd` around so that we can use
-the :func:`os.close` function to close the file.
+Este cliente de testes nos oferece uma interface fácil para a aplicação.
+Podemos disparar requisições de testes na aplicação, e o cliente também
+gerencia os cookies par nós.
 
-If we now run the test suite, we should see the following output::
+Como o SQLite3 é baseado em sistema de arquivos, podemos facilmente usar o módulo ``tempfile`` para criar um banco de dados temporário e incializá-lo. A função :func:`~tempfile.mkstemp` faz duas coisas: devolve um descritor de arquivo aberto e o caminho para o arquivo de nome aleatório; este último usamos como nome do banco de dados. Precisamos guardar o descritor `bd_arq` para podermos depois fechar o arquivo com a função :func:`os.close`.
+
+Se neste momento executarmos a suíte de testes, veremos o seguinte resultado::
 
     $ python flaskr_tests.py
 
@@ -81,43 +80,44 @@ If we now run the test suite, we should see the following output::
 
     OK
 
-Even though it did not run any actual tests, we already know that our flaskr
-application is syntactically valid, otherwise the import would have died
-with an exception.
 
-The First Test
+Mesmo não tendo executado nenhum teste, já sabemos que nossa aplicação Flaskr
+não tem erros de sintaxe, pois se tivesse o import inicial teria falhado.
+
+
+Primeiro teste
 --------------
 
-Now it's time to start testing the functionality of the application.  
-Let's check that the application shows "No entries here so far" if we 
-access the root of the application (``/``). To do this, we add a new
-test method to our class, like this::
+Agora é hora de começar a testar a funcionalidade da aplicação. Vamos verificar se a aplicação exibe "nenhuma entrada" ao acessar a raiz da aplicação (``/``).
+Para tanto, vamos acrescentar um método de testes em nossa classe, assim::
 
     class FlaskrTestCase(unittest.TestCase):
 
         def setUp(self):
-            self.db_fd, flaskr.app.config['DATABASE'] = tempfile.mkstemp()
+            self.bd_arq, flaskr.app.config['DATABASE'] = tempfile.mkstemp()
+            flaskr.app.config['TESTING'] = True
             self.app = flaskr.app.test_client()
-            flaskr.init_db()
+            flaskr.criar_bd()
 
         def tearDown(self):
-            os.close(self.db_fd)
-            os.unlink(flaskr.DATABASE)
+            os.close(self.bd_arq)
+            os.unlink(flaskr.app.config['DATABASE'])
 
-        def test_empty_db(self):
-            rv = self.app.get('/')
-            assert 'No entries here so far' in rv.data
+        def teste_bd_vazio(self):
+            res = self.app.get('/')
+            assert 'nenhuma entrada' in res.data
 
-Notice that our test functions begin with the word `test`; this allows 
-:mod:`unittest` to automatically identify the method as a test to run. 
+Observe que os métodos de teste usam o prefixo `test` [#]_; isso permite que o
+:mod:`unittest` identifique automaticamente estes métodos como testes a serem executados.
 
-By using `self.app.get` we can send an HTTP `GET` request to the application with 
-the given path.  The return value will be a :class:`~flask.Flask.response_class` object. 
-We can now use the :attr:`~werkzeug.wrappers.BaseResponse.data` attribute to inspect
-the return value (as string) from the application.  In this case, we ensure that 
-``'No entries here so far'`` is part of the output.
+O método `self.app.get` envia para a aplicação uma requisição HTTP GET para o
+caminho especificado. O valor devolvido será um objeto
+:class:`~flask.Flask.response_class`. Então podemos usar o atributo
+:attr:`~werkzeug.wrappers.BaseResponse.data` para inspecionar o conteúdo
+devolvido pela aplicação, que é uma string. Neste caso, verificamos que a sub-
+string ``'nenhuma entrada'`` está presente.
 
-Run it again and you should see one passing test::
+Rode o teste de novo e você verá que agora temos um teste passando::
 
     $ python flaskr_tests.py
     .
@@ -126,59 +126,64 @@ Run it again and you should see one passing test::
 
     OK
 
-Logging In and Out
-------------------
-
-The majority of the functionality of our application is only available for
-the administrative user, so we need a way to log our test client in and out
-of the application.  To do this, we fire some requests to the login and logout 
-pages with the required form data (username and password).  And because the 
-login and logout pages redirect, we tell the client to `follow_redirects`.
-
-Add the following two methods to your `FlaskrTestCase` class::
-
-   def login(self, username, password):
-       return self.app.post('/login', data=dict(
-           username=username,
-           password=password
-       ), follow_redirects=True)
-
-   def logout(self):
-       return self.app.get('/logout', follow_redirects=True)
-
-Now we can easily test that logging in and out works and that it fails with
-invalid credentials.  Add this new test to the class::
-
-   def test_login_logout(self):
-       rv = self.login('admin', 'default')
-       assert 'You were logged in' in rv.data
-       rv = self.logout()
-       assert 'You were logged out' in rv.data
-       rv = self.login('adminx', 'default')
-       assert 'Invalid username' in rv.data
-       rv = self.login('admin', 'defaultx')
-       assert 'Invalid password' in rv.data
-
-Test Adding Messages
+Logando e deslogando
 --------------------
 
-We should also test that adding messages works.  Add a new test method
-like this::
+A maior parte das funcionalidades da nossa aplicação só está disponível para o
+usuário administrador, por isso precisamos de uma maneira de fazer o nosso
+cliente de teste logar e deslogar. Para tanto, vamos disparar requisições para
+as páginas de login e logout com os dados do obrigatórios do formulário
+(usuário e senha). E, como as páginas de login e logout fazem
+redirecionamentos, ordenamos que o cliente ``follow_redirects`` (seguir
+redirecionamento).
 
-    def test_messages(self):
+Coloque estes dois métodos na continuação da sua classe `FlaskrTestCase`::
+
+    def login(self, username, password):
+        return self.app.post('/entrar', data=dict(
+                username=username,
+                password=password
+            ), follow_redirects=True)
+
+    def logout(self):
+        return self.app.get('/sair', follow_redirects=True)
+
+Agora podemos facilmente verificar que logar e deslogar funciona, e que o
+login exige as credenciais corretas. Acrescente este novo teste à classe
+[#]_::
+
+    def teste_login_logout(self):
+        rv = self.login('admin', 'default')
+        assert 'Login OK' in rv.data
+        rv = self.logout()
+        assert 'Logout OK' in rv.data
+        rv = self.login('adminx', 'default')
+        assert 'Usuário inválido' in rv.data
+        rv = self.login('admin', 'defaultx')
+        assert 'Senha inválida' in rv.data
+
+
+Testar inserção de entradas
+---------------------------
+
+Também devemos testar que é possível inserir entradas no blog. Crie um novo
+método de teste assim::
+
+    def teste_nova_entrada(self):
         self.login('admin', 'default')
-        rv = self.app.post('/add', data=dict(
-            title='<Hello>',
-            text='<strong>HTML</strong> allowed here'
+        rv = self.app.post('/inserir', data=dict(
+            titulo='<Olá>',
+            texto='<strong>HTML</strong> é permitido aqui'
         ), follow_redirects=True)
-        assert 'No entries here so far' not in rv.data
-        assert '&lt;Hello&gt;' in rv.data
-        assert '<strong>HTML</strong> allowed here' in rv.data
+        assert rv.status_code == 200
+        assert 'nenhuma entrada' not in rv.data
+        assert '&lt;Olá&gt;' in rv.data
+        assert '<strong>HTML</strong> é permitido aqui' in rv.data
 
-Here we check that HTML is allowed in the text but not in the title,
-which is the intended behavior.
+Aqui verificamos que é permitido usar HTML no texto mas não no título, que é o
+comportamento desejado.
 
-Running that should now give us three passing tests::
+Ao executar os testes agora devemos ter três passando::
 
     $ python flaskr_tests.py
     ...
@@ -187,79 +192,79 @@ Running that should now give us three passing tests::
 
     OK
 
-For more complex tests with headers and status codes, check out the
-`MiniTwit Example`_ from the sources which contains a larger test
-suite.
 
+Para ver testes mais complexos verificando cabeçalhos e códigos de statos,
+veja o exemplo `MiniTwit`_ no repositório do Flask, que possui uma suite de
+testes mais extensa.
 
-.. _MiniTwit Example:
+.. _MiniTwit:
    http://github.com/mitsuhiko/flask/tree/master/examples/minitwit/
 
 
-Other Testing Tricks
---------------------
+Outros truques para testes
+--------------------------
 
-Besides using the test client as shown above, there is also the
-:meth:`~flask.Flask.test_request_context` method that can be used
-in combination with the `with` statement to activate a request context
-temporarily.  With this you can access the :class:`~flask.request`,
-:class:`~flask.g` and :class:`~flask.session` objects like in view
-functions.  Here is a full example that demonstrates this approach::
+Além de usar o cliente de testes apresentado acima, há também o método
+:meth:`~flask.Flask.test_request_context` que pode ser usado em combinação
+com a instrução ``with`` para ativar um contexto de requisição temporariamente. Com isso você pode acessar os objetos :class:`~flask.request`,
+:class:`~flask.g` e :class:`~flask.session` como se estivesse em uma função de view. Eis um exemplo que ilustra esta técnica::
 
     app = flask.Flask(__name__)
 
-    with app.test_request_context('/?name=Peter'):
+    with app.test_request_context('/?nome=Pedro'):
         assert flask.request.path == '/'
-        assert flask.request.args['name'] == 'Peter'
+        assert flask.request.args['nome'] == 'Pedro'
 
-All the other objects that are context bound can be used in the same
-way.
+Todos os demais objetos que são vinculados ao contexto pode ser usados da
+mesma maneira.
 
-If you want to test your application with different configurations and
-there does not seem to be a good way to do that, consider switching to
-application factories (see :ref:`app-factories`).
+Se você quer testar sua aplicação com diferentes configurações e procuar uma
+boa forma de fazer isso, considere o uso de uma fábrica de aplicações (veja
+:ref:`app-factories`).
 
-Note however that if you are using a test request context, the
-:meth:`~flask.Flask.before_request` functions are not automatically called
-same for :meth:`~flask.Flask.after_request` functions.  However
-:meth:`~flask.Flask.teardown_request` functions are indeed executed when
-the test request context leaves the `with` block.  If you do want the
-:meth:`~flask.Flask.before_request` functions to be called as well, you
-need to call :meth:`~flask.Flask.preprocess_request` yourself::
+Note no entanto que se você está usando um contexto de requisição de teste, as
+funções :meth:`~flask.Flask.before_request` e
+:meth:`~flask.Flask.after_request` não são automaticamente invocadas. No
+entanto, as funções :meth:`~flask.Flask.teardown_request` são invocadas quando
+o bloco ``with`` é encerrado. Se você precisa que as funções funções
+:meth:`~flask.Flask.before_request` sejam invocadas, precisa chamar
+:meth:`~flask.Flask.preprocess_request` em seu teste::
 
     app = flask.Flask(__name__)
 
-    with app.test_request_context('/?name=Peter'):
+    with app.test_request_context('/?nome=Pedro'):
         app.preprocess_request()
         ...
 
-This can be necessary to open database connections or something similar
-depending on how your application was designed.
+Isto pode ser necessário para abrir a conexão com o banco de dados ou realizar
+alguma outra operação do gênero, dependendo de como sua aplicação foi
+projetada.
 
-If you want to call the :meth:`~flask.Flask.after_request` functions you
-need to call into :meth:`~flask.Flask.process_response` which however
-requires that you pass it a response object::
+Se quiser acionar as funções :meth:`~flask.Flask.after_request` terá que
+invocar :meth:`~flask.Flask.process_response`, que precisa receber um objeto
+`response`::
 
     app = flask.Flask(__name__)
 
-    with app.test_request_context('/?name=Peter'):
+    with app.test_request_context('/?nome=Pedro'):
         resp = Response('...')
         resp = app.process_response(resp)
         ...
 
-This in general is less useful because at that point you can directly
-start using the test client.
+
+Porém isso em geral não é tão util, porque neste ponto vale mais a pena usar o
+cliente de testes.
 
 
-Keeping the Context Around
---------------------------
+Mantendo o contexto por mais tempo
+----------------------------------
 
 .. versionadded:: 0.4
 
-Sometimes it is helpful to trigger a regular request but still keep the
-context around for a little longer so that additional introspection can
-happen.  With Flask 0.4 this is possible by using the
-:meth:`~flask.Flask.test_client` with a `with` block::
+Às vezes pode ser útil disparar uma requisição normalmente mas ainda assim
+manter o contexto vivo por mais um tempo para permitir alguma introspecção
+adicional. A partir do Flask 0.4 isso é possível usando o
+:meth:`~flask.Flask.test_client` em um bloco ``with``::
 
     app = flask.Flask(__name__)
 
@@ -267,37 +272,69 @@ happen.  With Flask 0.4 this is possible by using the
         rv = c.get('/?tequila=42')
         assert request.args['tequila'] == '42'
 
-If you were to use just the :meth:`~flask.Flask.test_client` without
-the `with` block, the `assert` would fail with an error because `request`
-is no longer available (because you are trying to use it outside of the actual request).
+Se você usasse apenas o :meth:`~flask.Flask.test_client` sem o bloco ``with``
+o ``assert`` geraria um erro porque o ``request`` não está mais disponível
+(você estaria tentando acessá-lo fora do contexto de uma requisição).
 
-Accessing and Modifying Sessions
---------------------------------
+
+Acessar e modificar sessões
+---------------------------
 
 .. versionadded:: 0.8
 
-Sometimes it can be very helpful to access or modify the sessions from the
-test client.  Generally there are two ways for this.  If you just want to
-ensure that a session has certain keys set to certain values you can just
-keep the context around and access :data:`flask.session`::
+Às vezes pode ser muito útil acessar ou modificar uma sessão a partir do
+cliente de testes. Geralmente há duas formas de fazer isto. Se você apenas
+quer verificar que a sessão tem determinadas chaves com certos valores, pode
+simplesmente manter o contexto ativo e acessar :data:`flask.session`::
 
     with app.test_client() as c:
         rv = c.get('/')
         assert flask.session['foo'] == 42
 
-This however does not make it possible to also modify the session or to
-access the session before a request was fired.  Starting with Flask 0.8 we
-provide a so called “session transaction” which simulates the appropriate
-calls to open a session in the context of the test client and to modify
-it.  At the end of the transaction the session is stored.  This works
-independently of the session backend used::
+Entretanto, desta maneira não é possível modificar a sessão ou acessar a
+sessão antes da requisição ser disparada. A partir do Flask 0.8 fornecemos uma
+"transação de sessão" que simula as chamadas apropriadas para se abrir uma
+sessão no contexto do cliente de testes e modificá-la. Ao final da transação,
+a sessão é armazenada. Isto funciona independente do backend de sessão que
+estiver sendo usado::
 
     with app.test_client() as c:
-        with c.session_transaction() as sess:
-            sess['a_key'] = 'a value'
+        with c.session_transaction() as sessao:
+            sessao['uma_chave'] = 'um valor'
 
-        # once this is reached the session was stored
+        # ao chegar aqui a sessão estará armazenada
 
-Note that in this case you have to use the ``sess`` object instead of the
-:data:`flask.session` proxy.  The object however itself will provide the
-same interface.
+Note que neste caso você deve usar o objeto ``sessao`` em vez do proxy
+:data:`flask.session`. Entretanto o este objeto implementa a mesma interface.
+
+
+.. rubric:: Notas da tradução
+
+.. [#] Os métodos de teste podem começar com a palavra `teste` também. O
+   importante é que as primeiras letras sejam ``test``, pois este é o prefixo
+   default definido em ``unittest.TestLoader.testMethodPrefix``.
+
+.. [#] Este teste revela uma armadilha sobre a representação das respostas
+   HTTP no Flask: ao incluir textos acentuados na resposta, como fazemos em
+   caso de erro na função ``flaskr.login``, precisamos passar este textos
+   como strings Unicode (instâncias de ``unicode``, denotadas pelo prefixo
+   ``u`` nas mensagens como ``u'Senha inválida'``). Se isso não for feito lá,
+   encontramos uma exceção porque o Flask assume que as strings de bytes
+   ``str`` passadas como parâmetro para o template são strings ASCII. No entanto, ao testar a resposta em ``teste_login_logout` somos obrigados a
+   usar strings de bytes ``str``, porque se usarmos ``unicode`` o Python
+   assume que a resposta em ``rv.data`` é uma string ASCII e ao tentar
+   converter para Unicode para poder comparar, uma exceção
+   ``UnicodeDecodeError`` é gerada. Por isso temos strings de bytes ``str``,
+   e neste caso funciona porque o nosso código-fonte está em UTF-8 (veja
+   o comentário na linha 1), e a resposta produzida pelo Flask utiliza este
+   mesmo encoding. Uma alternativa que também funciona é escrever os testes
+   assim::
+
+        assert u'Usuário inválido' in rv.data.decode('utf-8')
+
+   Aqui estamos explicitamente convertendo os dados da resposta de UTF-8
+   para Unicode, e assim podemos testar com segurança contra nossa string
+   ``unicode``. O problema que descrevemos aqui não acontece no tutorial
+   original do Flask, pois ele foi escrito em inglês, e lá todas as strings
+   são ASCII puro.
+
