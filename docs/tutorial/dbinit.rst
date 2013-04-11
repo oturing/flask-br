@@ -57,7 +57,7 @@ nas alterações. SQLite3 e outros bancos de dados transacionais não fazem
 
 Agora podemos criar o banco de dados iniciando um console do Python, importando e invocando aquela função::
 
->>> from flaskr import criar_bd()
+>>> from flaskr import criar_bd
 >>> criar_bd()
 
 .. admonition:: Em caso de erro
