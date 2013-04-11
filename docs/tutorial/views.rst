@@ -23,8 +23,8 @@ A função view renderiza o template `show_entries.html` passando as entradas co
 
     @app.route('/')
     def exibir_entradas():
-        sql = '''select titulo, texto from entriadas order by id desc'''
-        cur = g.db.execute(sql)
+        sql = '''select titulo, texto from entradas order by id desc'''
+        cur = g.bd.execute(sql)
         entradas = [dict(titulo=titulo, texto=texto)
                         for titulo, texto in cur.fetchall()]
         return render_template('exibir_entradas.html', entradas=entradas)
@@ -40,8 +40,8 @@ Esta view permite que o usuário insira uma nova entrada se ele estiver logado. 
         if not session.get('logado'):
             abort(401)
         sql = '''insert into entradas (titulo, texto) values (?, ?)'''
-        g.db.execute(sql, [request.form['titulo'], request.form['texto']])
-        g.db.commit()
+        g.bd.execute(sql, [request.form['titulo'], request.form['texto']])
+        g.bd.commit()
         flash('Nova entrada registrada com sucesso')
         return redirect(url_for('exibir_entradas'))
 
